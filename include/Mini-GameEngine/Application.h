@@ -39,6 +39,7 @@ namespace MiniGameEngine{
 		template<typename T>
 		void pushLayer(){
 			static_assert(std::is_base_of<Layer, T>::value, "Pushed type not subclass of Layer");
+			// _layerStack.emplace_back(std::make_shared<T>())->onAttach();
 			_layerStack.emplace_back(std::make_shared<T>())->onAttach();
 		}
 

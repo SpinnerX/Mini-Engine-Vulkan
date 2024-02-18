@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libMini-GameEngine.a "CMakeFiles/Mini-GameEngine.dir/Mini-GameEngine/Application.cpp.o"
+/Library/Developer/CommandLineTools/usr/bin/ranlib libMini-GameEngine.a

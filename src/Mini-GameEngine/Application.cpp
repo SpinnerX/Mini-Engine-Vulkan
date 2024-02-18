@@ -10,10 +10,9 @@
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
 #include <glm/glm.hpp>
+#include <Mini-GameEngine/ImGui/Roboto-Regular.embed>
 
 
-
-/* #include "ImGui/Roboto-Regular.embed" */
 extern bool g_applicationRunning;
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
@@ -61,7 +60,45 @@ namespace MiniGameEngine{
 
 	static MiniGameEngine::Application* _instance = nullptr;
 
-	void check_vk_result(VkResult err){
+	void check_vk_result(const char* function, int line, VkResult err){
+		if(err == 0)
+			return;
+		std::string resultString = "Default";
+		
+		switch (err){
+        case VK_SUCCESS:
+            resultString = "SUCCESS";
+			break;
+        case VK_ERROR_OUT_OF_HOST_MEMORY:
+            resultString = "OUT OF HOST MEMORY";
+			break;
+        case VK_ERROR_OUT_OF_DEVICE_MEMORY:
+            resultString = "OUT OF DEVICE MEMORY";
+			break;
+        case VK_ERROR_INITIALIZATION_FAILED:
+            resultString = "INITIALIZATION FAILED";
+			break;
+        case VK_ERROR_LAYER_NOT_PRESENT:
+            resultString = "LAYER NOT PRESENT";
+			break;
+        case VK_ERROR_EXTENSION_NOT_PRESENT:
+            resultString = "EXTENSION NOT PRESENT";
+			break;
+        case VK_ERROR_INCOMPATIBLE_DRIVER:
+            resultString = "INCOMPATIBLE DRIVER";
+			break;
+        default:
+			resultString = "Default";
+            break;
+		}
+
+		printf("[vulkan] Error: VkResult = %d at function = %s on line %d [STATUS = %s]\n", err, function, line, resultString.c_str());
+
+		if(err < 0)
+			std::abort();
+	}
+	
+	void check_vk_result2(VkResult err){
 		if(err == 0)
 			return;
 		printf("[vulkan] Error: VkResult = %d\n", err);
@@ -119,7 +156,7 @@ namespace MiniGameEngine{
 			check_vk_result(err);
 		#else
 			err = vkCreateInstance(&createInfo, g_Allocator, &g_instance);
-			check_vk_result(err);
+			check_vk_result(__FUNCTION__, __LINE__, err);
 			IM_UNUSED(g_debugReport);
 		#endif
 
@@ -127,7 +164,7 @@ namespace MiniGameEngine{
 			{
 				uint32_t gpuCount;
 				err = vkEnumeratePhysicalDevices(g_instance, &gpuCount, nullptr);
-				check_vk_result(err);
+				check_vk_result(__FUNCTION__, __LINE__, err);
 				IM_ASSERT(gpuCount > 1);
 
 				VkPhysicalDevice* gpus = (VkPhysicalDevice *)malloc(sizeof(VkPhysicalDevice) * gpuCount);
@@ -189,7 +226,7 @@ namespace MiniGameEngine{
 				createInfo.ppEnabledExtensionNames = deviceExtensions;
 
 				err = vkCreateDevice(g_physicalDevice, &createInfo, g_Allocator, &g_device);
-				check_vk_result(err);
+				check_vk_result(__FUNCTION__, __LINE__, err);
 				vkGetDeviceQueue(g_device, g_queueFamilty, 0, &g_queue);
 			}
 
@@ -215,7 +252,7 @@ namespace MiniGameEngine{
 			poolInfo.poolSizeCount = (uint32_t)IM_ARRAYSIZE(poolSizes);
 			poolInfo.pPoolSizes = poolSizes;
 			err = vkCreateDescriptorPool(g_device, &poolInfo, g_Allocator, &g_descriptorPool);
-			check_vk_result(err);
+			check_vk_result(__FUNCTION__, __LINE__, err);
 		}
 	}
 
@@ -279,7 +316,7 @@ namespace MiniGameEngine{
 			return;
 		}
 
-		check_vk_result(err);
+		check_vk_result(__FUNCTION__, __LINE__, err);
 
 		_currentFrameIndex = (_currentFrameIndex + 1) % g_mainWindowData.ImageCount;
 
@@ -287,10 +324,10 @@ namespace MiniGameEngine{
 
 		{
 			err = vkWaitForFences(g_device, 1, &frameData->Fence, VK_TRUE, UINT64_MAX);
-			check_vk_result(err);
+			check_vk_result(__FUNCTION__, __LINE__, err);
 
 			err = vkResetFences(g_device, 1, &frameData->Fence);
-			check_vk_result(err);
+			check_vk_result(__FUNCTION__, __LINE__, err);
 		}
 		
 		// Free resources in queue
@@ -312,13 +349,13 @@ namespace MiniGameEngine{
 			}
 
 			err = vkResetCommandPool(g_device, frameData->CommandPool, 0);
-			check_vk_result(err);
+			check_vk_result(__FUNCTION__, __LINE__, err);
 
 			VkCommandBufferBeginInfo info = {};
 			info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 			info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 			err = vkBeginCommandBuffer(frameData->CommandBuffer, &info);
-			check_vk_result(err);
+			check_vk_result(__FUNCTION__, __LINE__, err);
 		}
 
 		{
@@ -352,10 +389,10 @@ namespace MiniGameEngine{
 			info.pSignalSemaphores = &renderCompleteSemaphore;
 
 			err = vkEndCommandBuffer(frameData->CommandBuffer);
-			check_vk_result(err);
+			check_vk_result(__FUNCTION__, __LINE__, err);
 
 			err = vkQueueSubmit(g_queue, 1, &info, frameData->Fence);
-			check_vk_result(err);
+			check_vk_result(__FUNCTION__, __LINE__, err);
 		}
 	}
 
@@ -379,7 +416,7 @@ namespace MiniGameEngine{
 			return;
 		}
 
-		check_vk_result(err);
+		check_vk_result(__FUNCTION__, __LINE__, err);
 		window->SemaphoreIndex = (window->SemaphoreIndex + 1) % window->ImageCount; // @note can use next set of semaphores
 	}
 
@@ -425,10 +462,323 @@ namespace MiniGameEngine{
 
 		// Create Window Surface
 		VkSurfaceKHR surface;
-		/* VkResult err = glfwCreateWindowSurface(g_instance, _windowHandle, g_Allocator, &surface); */
 		VkResult err = glfwCreateWindowSurface(g_instance, _windowHandle, g_Allocator, &surface);
 		
+		check_vk_result(__FUNCTION__, __LINE__, err);
+
+		// Creating Framebuffers
+		int width, height;
+		glfwGetFramebufferSize(_windowHandle, &width, &height);
+
+		ImGui_ImplVulkanH_Window* wd = &g_mainWindowData;
+		setupVulkanWindow(wd, surface, width, height);
+
+		_allocatedCommandBuffers.resize(wd->ImageCount);
+		_resourceFreeQueue.resize(wd->ImageCount);
+
+		// Setting up imgui
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+
+		ImGui::StyleColorsDark();
+
+		ImGuiStyle& style = ImGui::GetStyle();
+		if(io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable){
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
+
+		// Setup Platform/Renderer backends
+		ImGui_ImplGlfw_InitForVulkan(_windowHandle, true);
+		ImGui_ImplVulkan_InitInfo init_info = {};
+		init_info.Instance = g_instance;
+		init_info.PhysicalDevice = g_physicalDevice;
+		init_info.Device = g_device;
+		init_info.QueueFamily = g_queueFamilty;
+		init_info.Queue = g_queue;
+		init_info.PipelineCache = g_pipelineCache;
+		init_info.DescriptorPool = g_descriptorPool;
+		init_info.Subpass = 0;
+		init_info.MinImageCount = g_minImageCOunt;
+		init_info.ImageCount = wd->ImageCount;
+		init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+		init_info.Allocator = g_Allocator;
+		init_info.CheckVkResultFn = check_vk_result2;
+		ImGui_ImplVulkan_Init(&init_info, wd->RenderPass);
+
+		// Load default font
+		ImFontConfig fontConfig;
+		fontConfig.FontDataOwnedByAtlas = false;
+		ImFont* robotoFont = io.Fonts->AddFontFromMemoryTTF((void*)g_RobotoRegular, sizeof(g_RobotoRegular), 20.0f, &fontConfig);
+		io.FontDefault = robotoFont;
+
+		// Upload Fonts
+		{
+			VkCommandPool commandPool = wd->Frames[wd->FrameIndex].CommandPool;
+			VkCommandBuffer commandBuffer = wd->Frames[wd->FrameIndex].CommandBuffer;
+
+			err = vkResetCommandPool(g_device, commandPool, 0);
+			check_vk_result(__FUNCTION__, __LINE__, err);
+
+			VkCommandBufferBeginInfo beginInfo = {};
+			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+			beginInfo.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+			err = vkBeginCommandBuffer(commandBuffer, &beginInfo);
+			check_vk_result(__FUNCTION__, __LINE__, err);
+
+			/* ImGui_ImplVulkan_CreateFontsTexture(commandBuffer); */
+			ImGui_ImplVulkan_CreateFontsTexture();
+
+			VkSubmitInfo end_info = {};
+			end_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+			end_info.commandBufferCount = 1;
+			end_info.pCommandBuffers = &commandBuffer;
+			err = vkEndCommandBuffer(commandBuffer);
+			check_vk_result(__FUNCTION__, __LINE__, err);
+			err = vkQueueSubmit(g_queue, 1, &end_info, VK_NULL_HANDLE);
+			check_vk_result(__FUNCTION__, __LINE__, err);
+
+			err = vkDeviceWaitIdle(g_device);
+			check_vk_result(__FUNCTION__, __LINE__, err);
+			/* ImGui_ImplVulkan_DestroyFontUploadObjects(); */
+			ImGui_ImplVulkan_DestroyFontsTexture();
+		}
+	}
+	
+	void Application::shutdown(){
+		for(auto& layer : _layerStack)
+			layer->onDetach();
+
+		_layerStack.clear();
+
+		// Cleanup
+		VkResult err = vkDeviceWaitIdle(g_device);
+		check_vk_result(__FUNCTION__, __LINE__, err);
+
+		// Free resources in queue
+		for(auto& queue : _resourceFreeQueue){
+			for(auto& func : queue)
+				func();
+		}
+
+		_resourceFreeQueue.clear();
+
+		ImGui_ImplVulkan_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+
+		cleanupVulkanWindow();
+		cleanupVulkan();
+
+		glfwDestroyWindow(_windowHandle);
+		glfwTerminate();
+
+		g_applicationRunning = false;
+
 	}
 
+	void Application::run(){
+		_isRunning = true;
+
+		ImGui_ImplVulkanH_Window* wd = &g_mainWindowData;
+		ImVec4 clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+		ImGuiIO& io = ImGui::GetIO();
+
+		while(!glfwWindowShouldClose(_windowHandle)){
+			// Pool and handling events (inputs, window resize, etc.)
+			// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
+			// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
+			// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
+			// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
+
+			glfwPollEvents();
+
+			for(auto& layer : _layerStack)
+				layer->onUpdate(_timeStep);
+			
+			// resize swap chain
+			if(g_swapChainRebuild){
+				int width, height;
+				glfwGetFramebufferSize(_windowHandle, &width, &height);
+				if (width > 0 && height > 0){
+					ImGui_ImplVulkan_SetMinImageCount(g_minImageCOunt);
+					ImGui_ImplVulkanH_CreateOrResizeWindow(g_instance, g_physicalDevice, g_device, &g_mainWindowData, g_queueFamilty, g_Allocator, width, height, g_minImageCOunt);
+					g_mainWindowData.FrameIndex = 0;
+
+					// Clear allocated command buffers from here since entire pool is destroyed
+					_allocatedCommandBuffers.clear();
+					_allocatedCommandBuffers.resize(g_mainWindowData.ImageCount);
+
+					g_swapChainRebuild = false;
+				}
+			}
+
+			// Starting imgui frame
+			ImGui_ImplVulkan_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+
+			{
+				static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
+
+				// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+				// because it would be confusing to have two docking targets within each others.
+				ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
+				if (_menubarCallback)
+					window_flags |= ImGuiWindowFlags_MenuBar;
+
+				const ImGuiViewport* viewport = ImGui::GetMainViewport();
+				ImGui::SetNextWindowPos(viewport->WorkPos);
+				ImGui::SetNextWindowSize(viewport->WorkSize);
+				ImGui::SetNextWindowViewport(viewport->ID);
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+				window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+				window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+				// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background
+				// and handle the pass-thru hole, so we ask Begin() to not render a background.
+				if (dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
+					window_flags |= ImGuiWindowFlags_NoBackground;
+
+				// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+				// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
+				// all active windows docked into it will lose their parent and become undocked.
+				// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
+				// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+				ImGui::Begin("DockSpace Demo", nullptr, window_flags);
+				ImGui::PopStyleVar();
+
+				ImGui::PopStyleVar(2);
+
+				// Submit the DockSpace
+				ImGuiIO& io = ImGui::GetIO();
+				if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable){
+					ImGuiID dockspace_id = ImGui::GetID("VulkanAppDockspace");
+					ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspaceFlags);
+				}
+
+				if (_menubarCallback){
+					if (ImGui::BeginMenuBar()){
+						_menubarCallback();
+						ImGui::EndMenuBar();
+					}
+				}
+
+				for (auto& layer : _layerStack)
+					layer->onUIRender();
+
+				ImGui::End();
+			}
+
+			// Rendering
+			ImGui::Render();
+			ImDrawData* main_draw_data = ImGui::GetDrawData();
+			const bool main_is_minimized = (main_draw_data->DisplaySize.x <= 0.0f || main_draw_data->DisplaySize.y <= 0.0f);
+			wd->ClearValue.color.float32[0] = clearColor.x * clearColor.w;
+			wd->ClearValue.color.float32[1] = clearColor.y * clearColor.w;
+			wd->ClearValue.color.float32[2] = clearColor.z * clearColor.w;
+			wd->ClearValue.color.float32[3] = clearColor.w;
+			if (!main_is_minimized)
+				frameRender(wd, main_draw_data);
+
+			// Update and Render additional Platform Windows
+			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				ImGui::UpdatePlatformWindows();
+				ImGui::RenderPlatformWindowsDefault();
+			}
+
+			// Present Main Platform Window
+			if (!main_is_minimized)
+				framePresent(wd);
+
+			float time = getTime();
+			_frameTime = time - _lastFrameTime;
+			_timeStep = glm::min<float>(_frameTime, 0.0333f);
+			_lastFrameTime = time;
+		}
+	}
+
+	void Application::close(){
+		_isRunning = false;
+	}
+
+	float Application::getTime(){
+		return (float)glfwGetTime();
+	}
+
+	VkInstance Application::getInstance(){
+		return g_instance;
+	}
+
+	VkPhysicalDevice Application::getPhysicalDevice(){
+		return g_physicalDevice;
+	}
+
+	VkDevice Application::getDevice(){
+		return g_device;
+	}
+
+	VkCommandBuffer Application::getCommandBuffer(bool begin){
+		ImGui_ImplVulkanH_Window* wd = &g_mainWindowData;
+
+		// Use any command queue
+		VkCommandPool command_pool = wd->Frames[wd->FrameIndex].CommandPool;
+
+		VkCommandBufferAllocateInfo cmdBufAllocateInfo = {};
+		cmdBufAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		cmdBufAllocateInfo.commandPool = command_pool;
+		cmdBufAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		cmdBufAllocateInfo.commandBufferCount = 1;
+
+		VkCommandBuffer& command_buffer = _allocatedCommandBuffers[wd->FrameIndex].emplace_back();
+		auto err = vkAllocateCommandBuffers(g_device, &cmdBufAllocateInfo, &command_buffer);
+
+		VkCommandBufferBeginInfo begin_info = {};
+		begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		begin_info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+		err = vkBeginCommandBuffer(command_buffer, &begin_info);
+		check_vk_result(__FUNCTION__, __LINE__, err);
+
+		return command_buffer;
+	}
+
+	void Application::flushCommandBuffer(VkCommandBuffer commandBuffer){
+		const uint64_t DEFAULT_FENCE_TIMEOUT = 100000000000;
+
+		VkSubmitInfo end_info = {};
+		end_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		end_info.commandBufferCount = 1;
+		end_info.pCommandBuffers = &commandBuffer;
+		auto err = vkEndCommandBuffer(commandBuffer);
+		check_vk_result(__FUNCTION__, __LINE__, err);
+
+		// Create fence to ensure that the command buffer has finished executing
+		VkFenceCreateInfo fenceCreateInfo = {};
+		fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+		fenceCreateInfo.flags = 0;
+		VkFence fence;
+		err = vkCreateFence(g_device, &fenceCreateInfo, nullptr, &fence);
+		check_vk_result(__FUNCTION__, __LINE__, err);
+
+		err = vkQueueSubmit(g_queue, 1, &end_info, fence);
+		check_vk_result(__FUNCTION__, __LINE__, err);
+
+		err = vkWaitForFences(g_device, 1, &fence, VK_TRUE, DEFAULT_FENCE_TIMEOUT);
+		check_vk_result(__FUNCTION__, __LINE__, err);
+
+		vkDestroyFence(g_device, fence, nullptr);
+	}
+
+	void Application::submitResourceFree(std::function<void ()> &&func){
+		_resourceFreeQueue[_currentFrameIndex].emplace_back(func);
+	}
 
 };

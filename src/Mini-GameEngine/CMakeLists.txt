@@ -1,11 +1,19 @@
 set(
   all_src
   Mini-GameEngine/Application.cpp
+  Mini-GameEngine/Input/Input.cpp
+  ../include/Mini-GameEngine/image/stb_image.cpp
 )
 
 set(
   all_headers
   ../include/Mini-GameEngine/Application.h
+  ../include/Mini-GameEngine/Image.h
+  ../include/Mini-GameEngine/Layer.h
+  ../include/Mini-GameEngine/Random.h
+  ../include/Mini-GameEngine/Timer.h
+  ../include/Mini-GameEngine/Input/Input.h
+  ../include/Mini-GameEngine/Input/KeyCodes.h
   ../include/Mini-GameEngine/ImGui/Roboto-Regular.embed
 )
 

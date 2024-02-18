@@ -23,12 +23,8 @@ add_subdirectory(src)
 
 message("Message = ${CMAKE_INSTALL_PREFIX}")
 
-target_precompile_headers(${PROJECT_NAME} PUBLIC
-	"$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_INSTALL_PREFIX}/include/GameEngine/GameEnginePrecompiledHeader.h>"
-)
-
 install(
-  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/GameEngine"
+  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/Mini-GameEngine"
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 

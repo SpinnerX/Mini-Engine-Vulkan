@@ -1,0 +1,13 @@
+/Users/aaronher/Desktop/Mini-Engine-Vulkan/Debug/CMakeFiles/edit_cache.dir
+/Users/aaronher/Desktop/Mini-Engine-Vulkan/Debug/CMakeFiles/rebuild_cache.dir
+/Users/aaronher/Desktop/Mini-Engine-Vulkan/Debug/CMakeFiles/list_install_components.dir
+/Users/aaronher/Desktop/Mini-Engine-Vulkan/Debug/CMakeFiles/install.dir
+/Users/aaronher/Desktop/Mini-Engine-Vulkan/Debug/CMakeFiles/install/local.dir
+/Users/aaronher/Desktop/Mini-Engine-Vulkan/Debug/CMakeFiles/install/strip.dir
+/Users/aaronher/Desktop/Mini-Engine-Vulkan/Debug/src/CMakeFiles/Mini-GameEngine.dir
+/Users/aaronher/Desktop/Mini-Engine-Vulkan/Debug/src/CMakeFiles/edit_cache.dir
+/Users/aaronher/Desktop/Mini-Engine-Vulkan/Debug/src/CMakeFiles/rebuild_cache.dir
+/Users/aaronher/Desktop/Mini-Engine-Vulkan/Debug/src/CMakeFiles/list_install_components.dir
+/Users/aaronher/Desktop/Mini-Engine-Vulkan/Debug/src/CMakeFiles/install.dir
+/Users/aaronher/Desktop/Mini-Engine-Vulkan/Debug/src/CMakeFiles/install/local.dir
+/Users/aaronher/Desktop/Mini-Engine-Vulkan/Debug/src/CMakeFiles/install/strip.dir
