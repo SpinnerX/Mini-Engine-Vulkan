@@ -8,47 +8,20 @@ set(
   ../include/Mini-GameEngine/Application.h
 )
 
-# Finding opengl, glfw, glew, glut, and possibly freetype and even freeglut
-find_package(glfw3 3.4 REQUIRED)
-find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(GLUT REQUIRED)
-find_package(FREEGLUT REQUIRED)
+# # Finding opengl, glfw, glew, glut, and possibly freetype and even freeglut
+# find_package(glfw3 3.4 REQUIRED)
+# find_package(OpenGL REQUIRED)
+# find_package(GLEW REQUIRED)
+# find_package(GLUT REQUIRED)
+# find_package(FREEGLUT REQUIRED)
 
-find_package(fmt REQUIRED)
-find_package(spdlog REQUIRED)
-find_package(glad REQUIRED)
-find_package(glm REQUIRED)
-find_package(Vulkan REQUIRED)
+# find_package(fmt REQUIRED)
+# find_package(spdlog REQUIRED)
+# find_package(glad REQUIRED)
+# find_package(glm REQUIRED)
+# find_package(Vulkan REQUIRED)
 
 add_library(${PROJECT_NAME} ${all_src} ${all_headers})
-
-# if(APPLE)
-
-    # This is making sure we find the SDL libraries on mac
-    # include_directories(${SDL2_INCLUDE_DIRS})
-
-	if(VULKAN_FOUND)
-		message("Vulkan found!")
-		target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan)
-	endif()
-    # target_link_libraries(${PROJECT_NAME} pthread)
-    # Linking the libraries for Cocoa, OpenGL, IOKit, and glfw
-    target_link_libraries(${PROJECT_NAME}
-      "-framework Cocoa"
-      "-framework OpenGL"
-      "-framework IOKit"
-      glfw
-      fmt::fmt
-      glm::glm
-      spdlog::spdlog
-      ${OPENGL_gl_LIBRARY}
-      GLEW::GLEW
-      ${GLUT_LIBRARIES} # NOTE: If you want to use freeglut, then you need this to link freeglut to get working
-      glad::glad
-      ${APPKIT_LIBRARY} ${UNIFORMTYPEIDENTIFIERS_LIBRARY} # Note as TODO: Probably should put this somewhere else, since it relies on nfd.cmake...
-    )
-# endif(APPLE)
 
 target_include_directories(${PROJECT_NAME}
   PUBLIC

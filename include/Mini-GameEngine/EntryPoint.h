@@ -14,8 +14,9 @@ namespace MiniGameEngine{
 		return 0;
 	}
 };
-#ifdef MINI_GAMEENGINE_PLATFORMS
-#else
+
+// #ifdef MINI_GAMEENGINE_PLATFORMS
+// #else
 
 // #if WL_DIST
 // #else
@@ -24,4 +25,4 @@ int main(int argc, char** argv){
 	return MiniGameEngine::Main(argc, argv);
 }
 
-#endif
+// #endif
