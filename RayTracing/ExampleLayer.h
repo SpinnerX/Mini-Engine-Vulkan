@@ -7,8 +7,6 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-// using namespace MiniGameEngine;
-
 class ExampleLayer : public MiniGameEngine::Layer{
 public:
 	ExampleLayer();
