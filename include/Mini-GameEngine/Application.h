@@ -14,7 +14,7 @@
 namespace MiniGameEngine{
 
 	struct ApplicationSpecification{
-		std::string name = "Mini Game Engine";
+		std::string name = "Mini Engine3D";
 		uint32_t width = 1600;
 		uint32_t height = 900;
 	};
