@@ -4,6 +4,8 @@
 #include <imgui/backends/imgui_impl_vulkan.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
+#include <vulkan/vulkan_core.h>
 
 /* #define GLFW_INCLUDE_NONE */
 #define GLFW_INCLUDE_VULKAN
@@ -11,7 +13,6 @@
 #include <vulkan/vulkan.h>
 #include <glm/glm.hpp>
 #include <Mini-GameEngine/ImGui/Roboto-Regular.embed>
-
 
 extern bool g_applicationRunning;
 
@@ -120,10 +121,23 @@ namespace MiniGameEngine{
 		
 		// Creating a vulkan instance.
 		{
+			std::vector<const char*> extensions = {
+				VK_KHR_SURFACE_EXTENSION_NAME,
+				VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+				"VK_KHR_surface",
+				"VK_EXT_metal_surface",
+
+				VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+				VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME,
+			};
+
 			VkInstanceCreateInfo createInfo = {};
 			createInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-			createInfo.enabledExtensionCount = extensionCount;
-			createInfo.ppEnabledExtensionNames = extension;
+			// createInfo.enabledExtensionCount = extensionCount;
+			// createInfo.ppEnabledExtensionNames = extension;
+			createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+			createInfo.ppEnabledExtensionNames = extensions.data();
+			createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
 		#ifdef IMGUI_VULKAN_DEBUG_REPORT
 			const char* layers[] = { "VK_LAYER_KHRONOS_validation" };
 			createInfo.enabledLayerCount = 1;
@@ -210,7 +224,7 @@ namespace MiniGameEngine{
 			// Create Logical Device (with 1 queued)
 			{
 				int deviceExtensionCount = 1;
-				const char* deviceExtensions[] = { "VK_KHR_swapchain" };
+				const char* deviceExtensions[] = { "VK_KHR_swapchain", "VK_EXT_metal_surface", };
 				const float queuePriority[] = { 1.0f };
 				VkDeviceQueueCreateInfo queueInfo[1] = {};
 				queueInfo[0].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -458,6 +472,8 @@ namespace MiniGameEngine{
 
 		uint32_t extensionCount =  0;
 		const char** extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
+
+		// std::vector<const char*> extensions = { &extensions };
 		setupVulkan(extensions, extensionCount);
 
 		// Create Window Surface
@@ -509,7 +525,8 @@ namespace MiniGameEngine{
 		init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 		init_info.Allocator = g_Allocator;
 		init_info.CheckVkResultFn = check_vk_result2;
-		ImGui_ImplVulkan_Init(&init_info, wd->RenderPass);
+		// ImGui_ImplVulkan_Init(&init_info, wd->RenderPass);
+		ImGui_ImplVulkan_Init(&init_info);
 
 		// Load default font
 		ImFontConfig fontConfig;

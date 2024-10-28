@@ -1,7 +1,7 @@
 #include <Mini-GameEngine/Application.h>
 #include <Mini-GameEngine/EntryPoint.h>
 #include <Mini-GameEngine/Image.h>
-
+#include <imgui/imgui.h>
 class ExampleLayer : public MiniGameEngine::Layer
 {
 public:

@@ -1,6 +1,9 @@
 set(
   all_src
   Mini-GameEngine/Application.cpp
+  Mini-GameEngine/Image/Image.cpp
+  Mini-GameEngine/Image/stb_image.cpp
+  Mini-GameEngine/Input/Input.cpp
 )
 
 set(

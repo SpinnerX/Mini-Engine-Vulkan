@@ -1,6 +1,7 @@
 #include "Mini-GameEngine/Application.h"
 #include "Mini-GameEngine/EntryPoint.h"
 #include "ExampleLayer.h"
+#include <imgui/imgui.h>
 
 MiniGameEngine::Application* MiniGameEngine::CreateApplication(int argc, char** argv){
 	MiniGameEngine::ApplicationSpecification spec;

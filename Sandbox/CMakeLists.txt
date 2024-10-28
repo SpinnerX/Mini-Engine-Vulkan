@@ -24,19 +24,25 @@ include_directories(
 # find_package(3DEngine REQUIRED)
 
 add_executable(${PROJECT_NAME} Application.cpp)
+find_package(glfw3 REQUIRED)
+find_package(fmt REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(box2d REQUIRED)
+find_package(yaml-cpp REQUIRED)
+find_package(glm REQUIRED)
+find_package(imguidocking REQUIRED)
 
 target_link_libraries(
     ${PROJECT_NAME} PUBLIC
     Mini-GameEngine
     glfw
-    # ${Vulkan_LIBRARIES}
-    fmt
-    spdlog
-    glm
-    tobanteGaming::Box2D
-    yaml-cpp
-    imgui
-    ImGuizmo
+    Vulkan::Vulkan
+    fmt::fmt
+    spdlog::spdlog
+    glm::glm
+    box2d::box2d
+    yaml-cpp::yaml-cpp
+    imguidocking::imguidocking
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR})
