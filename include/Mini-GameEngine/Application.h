@@ -31,7 +31,8 @@ namespace MiniGameEngine{
 
 		void setMenubarCallback(const std::function<void()>& menubarCallback) { _menubarCallback = menubarCallback; }
 
-		void pushLayer(const std::shared_ptr<Layer>& layer){
+		void pushLayer(Layer* layer){
+			// _layerStack.emplace_back(layer);
 			_layerStack.emplace_back(layer);
 			layer->onAttach();
 		}
@@ -40,7 +41,8 @@ namespace MiniGameEngine{
 		void pushLayer(){
 			static_assert(std::is_base_of<Layer, T>::value, "Pushed type not subclass of Layer");
 			// _layerStack.emplace_back(std::make_shared<T>())->onAttach();
-			_layerStack.emplace_back(std::make_shared<T>())->onAttach();
+			// _layerStack.emplace_back(std::make_shared<T>())->onAttach();
+			_layerStack.emplace_back(new T());
 		}
 
 		void close();
@@ -74,7 +76,8 @@ namespace MiniGameEngine{
 		float _frameTime = 0.0f;
 		float _lastFrameTime = 0.0f;
 
-		std::vector<std::shared_ptr<Layer>> _layerStack;
+		// std::vector<std::shared_ptr<Layer>> _layerStack;
+		std::vector<Layer*> _layerStack;
 		std::function<void()> _menubarCallback;
 	};
 	

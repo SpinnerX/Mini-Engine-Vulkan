@@ -29,25 +29,26 @@ set(all_headers ExampleLayer.h Camera.h Renderer.h Scene.h Ray.h)
 
 add_executable(${PROJECT_NAME} ${all_headers} ${all_src})
 
-find_package(glfw3 REQUIRED)
-find_package(fmt REQUIRED)
-find_package(spdlog REQUIRED)
-find_package(box2d REQUIRED)
-find_package(yaml-cpp REQUIRED)
-find_package(glm REQUIRED)
-find_package(imguidocking REQUIRED)
+target_link_libraries(${PROJECT_NAME} Mini-GameEngine)
+# find_package(glfw3 REQUIRED)
+# find_package(fmt REQUIRED)
+# find_package(spdlog REQUIRED)
+# find_package(box2d REQUIRED)
+# find_package(yaml-cpp REQUIRED)
+# find_package(glm REQUIRED)
+# find_package(imguidocking REQUIRED)
 
-target_link_libraries(
-    ${PROJECT_NAME} PUBLIC
-    Mini-GameEngine
-    glfw
-    Vulkan::Vulkan
-    fmt::fmt
-    spdlog::spdlog
-    glm::glm
-    box2d::box2d
-    yaml-cpp::yaml-cpp
-    imguidocking::imguidocking
-)
+# target_link_libraries(
+#     ${PROJECT_NAME} PUBLIC
+#     Mini-GameEngine
+#     glfw
+#     Vulkan::Vulkan
+#     fmt::fmt
+#     spdlog::spdlog
+#     glm::glm
+#     box2d::box2d
+#     yaml-cpp::yaml-cpp
+#     imguidocking::imguidocking
+# )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR})

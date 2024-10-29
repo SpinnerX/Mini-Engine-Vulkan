@@ -116,63 +116,107 @@ namespace MiniGameEngine{
 	}
 
 	
-	static void setupVulkan(const char** extension, uint32_t extensionCount){
+	// static void setupVulkan(const char** extension, uint32_t extensionCount){
+	static void setupVulkan(std::vector<const char*>& extension, uint32_t extensionCount){
 		VkResult err;
 		
 		// Creating a vulkan instance.
 		{
-			std::vector<const char*> extensions = {
-				VK_KHR_SURFACE_EXTENSION_NAME,
-				VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
-				"VK_KHR_surface",
-				"VK_EXT_metal_surface",
+			// "VK_KHR_surface",
+			// "VK_EXT_metal_surface",
 
-				VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
-				VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME,
-			};
+			// VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+			// VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
+			// VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME,
 
-			VkInstanceCreateInfo createInfo = {};
-			createInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-			// createInfo.enabledExtensionCount = extensionCount;
-			// createInfo.ppEnabledExtensionNames = extension;
-			createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-			createInfo.ppEnabledExtensionNames = extensions.data();
-			createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
-		#ifdef IMGUI_VULKAN_DEBUG_REPORT
-			const char* layers[] = { "VK_LAYER_KHRONOS_validation" };
-			createInfo.enabledLayerCount = 1;
-			createInfo.ppEnabledLayerNames = layers;
+		// 	extension.push_back("VK_EXT_metal_surface");
+		// 	extension.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 
-			// Enabling debugging reports extensions (we need additional storage, so duplicating user array to add new extension to it)
-			const char** extensionExt = (const char**)malloc(sizeof(const char *) * (extensionCount + 1));
-			memcpy(extensionExt, extension, extensionCount + sizeof(const char *));
-			extensionExt[extensionCount] = "VK_EXT_debug_report";
-			createInfo.enabledExtensionCount = extensionCount +1;
-			createInfo.ppEnabledExtensionNames = extensionExt;
+		// 	VkInstanceCreateInfo createInfo = {};
+		// 	createInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		// 	// createInfo.enabledExtensionCount = extensionCount;
+		// 	// createInfo.ppEnabledExtensionNames = extension;
+		// 	createInfo.enabledExtensionCount = static_cast<uint32_t>(extension.size());
+		// 	createInfo.ppEnabledExtensionNames = extension.data();
+		// 	// createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+		// #ifdef IMGUI_VULKAN_DEBUG_REPORT
+		// 	const char* layers[] = { "VK_LAYER_KHRONOS_validation" };
+		// 	createInfo.enabledLayerCount = 1;
+		// 	createInfo.ppEnabledLayerNames = layers;
 
-			// Creating vulkan instance
-			err = vkCreateInstance(&createInfo, g_Allocator, &g_instance);
-			check_vk_result(err);
-			free(extensionExt);
+		// 	// Enabling debugging reports extensions (we need additional storage, so duplicating user array to add new extension to it)
+		// 	const char** extensionExt = (const char**)malloc(sizeof(const char *) * (extensionCount + 1));
+		// 	memcpy(extensionExt, extension, extensionCount + sizeof(const char *));
+		// 	extensionExt[extensionCount] = "VK_EXT_debug_report";
+		// 	createInfo.enabledExtensionCount = extensionCount +1;
+		// 	createInfo.ppEnabledExtensionNames = extensionExt;
 
-			// Getting function ptr  (required for any extension)
-			auto vkCreateDebugReportCallbackExt = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(g_instance, "vkCreateDebugReportCallbackEXT");
-			IM_ASSERT(vkCreateDebugReportCallbackExt != nullptr);
+		// 	// Creating vulkan instance
+		// 	err = vkCreateInstance(&createInfo, g_Allocator, &g_instance);
+		// 	check_vk_result(err);
+		// 	free(extensionExt);
 
-			// Setting up the debug report callback
-			VkDebugReportCallbackEXT debugReportCI = {};
+		// 	// Getting function ptr  (required for any extension)
+		// 	auto vkCreateDebugReportCallbackExt = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(g_instance, "vkCreateDebugReportCallbackEXT");
+		// 	IM_ASSERT(vkCreateDebugReportCallbackExt != nullptr);
 
-			debugReportCI.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
-			debugReportCI.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
-			debugReportCI.pfnCallback = debug_report;
-			debugReportCI.pUserData = NULL;
-			err = vkCreateDebugReportCallbackEXT(g_instance, &debugReportCI, g_Allocator, &g_debugReport);
-			check_vk_result(err);
-		#else
-			err = vkCreateInstance(&createInfo, g_Allocator, &g_instance);
-			check_vk_result(__FUNCTION__, __LINE__, err);
-			IM_UNUSED(g_debugReport);
+		// 	// Setting up the debug report callback
+		// 	VkDebugReportCallbackEXT debugReportCI = {};
+
+		// 	debugReportCI.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+		// 	debugReportCI.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
+		// 	debugReportCI.pfnCallback = debug_report;
+		// 	debugReportCI.pUserData = NULL;
+		// 	err = vkCreateDebugReportCallbackEXT(g_instance, &debugReportCI, g_Allocator, &g_debugReport);
+		// 	check_vk_result(err);
+		// #else
+		// 	err = vkCreateInstance(&createInfo, g_Allocator, &g_instance);
+		// 	check_vk_result(__FUNCTION__, __LINE__, err);
+		// 	IM_UNUSED(g_debugReport);
+		// #endif
+		VkResult err;
+	#ifdef IMGUI_IMPL_VULKAN_USE_VOLK
+		volkInitialize();
+	#endif
+
+		// Create Vulkan Instance
+		{
+				VkInstanceCreateInfo create_info = {};
+				create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+
+				// Enumerate available extensions
+				uint32_t properties_count;
+				ImVector<VkExtensionProperties> properties;
+				vkEnumerateInstanceExtensionProperties(nullptr, &properties_count, nullptr);
+				properties.resize(properties_count);
+				err = vkEnumerateInstanceExtensionProperties(nullptr, &properties_count, properties.Data);
+				// check_vk_result(err);
+
+				// Enable required extensions
+				// if (IsExtensionAvailable(properties, VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
+				extension.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+		#ifdef VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME
+				// if (IsExtensionAvailable(properties, VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME)){
+				extension.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+				create_info.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+				// }
 		#endif
+
+				// Enabling validation layers
+		#ifdef APP_USE_VULKAN_DEBUG_REPORT
+				const char* layers[] = { "VK_LAYER_KHRONOS_validation" };
+				create_info.enabledLayerCount = 1;
+				create_info.ppEnabledLayerNames = layers;
+				extension.push_back("VK_EXT_debug_report");
+		#endif
+
+				// Create Vulkan Instance
+				create_info.enabledExtensionCount = (uint32_t)extension.size();
+				create_info.ppEnabledExtensionNames = extension.data();
+				err = vkCreateInstance(&create_info, g_Allocator, &g_instance);
+				// check_vk_result(err);
+				check_vk_result(__FUNCTION__, __LINE__, err);
+			}
 
 			// Select GPU
 			{
@@ -472,9 +516,13 @@ namespace MiniGameEngine{
 
 		uint32_t extensionCount =  0;
 		const char** extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
+		std::vector<const char *> extension;
 
-		// std::vector<const char*> extensions = { &extensions };
-		setupVulkan(extensions, extensionCount);
+		for(uint32_t i = 0; i < extensionCount; i++){
+			extension.push_back(extensions[i]);
+		}
+
+		setupVulkan(extension, extensionCount);
 
 		// Create Window Surface
 		VkSurfaceKHR surface;
@@ -510,6 +558,25 @@ namespace MiniGameEngine{
 		}
 
 		// Setup Platform/Renderer backends
+		// ImGui_ImplGlfw_InitForVulkan(_windowHandle, true);
+		// ImGui_ImplVulkan_InitInfo init_info = {};
+		// init_info.Instance = g_instance;
+		// init_info.PhysicalDevice = g_physicalDevice;
+		// init_info.Device = g_device;
+		// init_info.QueueFamily = g_queueFamilty;
+		// init_info.Queue = g_queue;
+		// init_info.PipelineCache = g_pipelineCache;
+		// init_info.DescriptorPool = g_descriptorPool;
+		// init_info.Subpass = 0;
+		// init_info.RenderPass = wd->RenderPass;
+		// init_info.MinImageCount = g_minImageCOunt;
+		// init_info.ImageCount = wd->ImageCount;
+		// init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+		// init_info.Allocator = g_Allocator;
+		// init_info.CheckVkResultFn = check_vk_result2;
+		// ImGui_ImplVulkan_Init(&init_info);
+		// ImGui_ImplVulkan_Init(&init_info, wd->RenderPass);
+
 		ImGui_ImplGlfw_InitForVulkan(_windowHandle, true);
 		ImGui_ImplVulkan_InitInfo init_info = {};
 		init_info.Instance = g_instance;
@@ -519,52 +586,52 @@ namespace MiniGameEngine{
 		init_info.Queue = g_queue;
 		init_info.PipelineCache = g_pipelineCache;
 		init_info.DescriptorPool = g_descriptorPool;
+		init_info.RenderPass = wd->RenderPass;
 		init_info.Subpass = 0;
 		init_info.MinImageCount = g_minImageCOunt;
 		init_info.ImageCount = wd->ImageCount;
 		init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 		init_info.Allocator = g_Allocator;
 		init_info.CheckVkResultFn = check_vk_result2;
-		// ImGui_ImplVulkan_Init(&init_info, wd->RenderPass);
 		ImGui_ImplVulkan_Init(&init_info);
 
 		// Load default font
-		ImFontConfig fontConfig;
-		fontConfig.FontDataOwnedByAtlas = false;
-		ImFont* robotoFont = io.Fonts->AddFontFromMemoryTTF((void*)g_RobotoRegular, sizeof(g_RobotoRegular), 20.0f, &fontConfig);
-		io.FontDefault = robotoFont;
+		// ImFontConfig fontConfig;
+		// fontConfig.FontDataOwnedByAtlas = false;
+		// ImFont* robotoFont = io.Fonts->AddFontFromMemoryTTF((void*)g_RobotoRegular, sizeof(g_RobotoRegular), 20.0f, &fontConfig);
+		// io.FontDefault = robotoFont;
 
 		// Upload Fonts
-		{
-			VkCommandPool commandPool = wd->Frames[wd->FrameIndex].CommandPool;
-			VkCommandBuffer commandBuffer = wd->Frames[wd->FrameIndex].CommandBuffer;
+		// {
+		// 	VkCommandPool commandPool = wd->Frames[wd->FrameIndex].CommandPool;
+		// 	VkCommandBuffer commandBuffer = wd->Frames[wd->FrameIndex].CommandBuffer;
 
-			err = vkResetCommandPool(g_device, commandPool, 0);
-			check_vk_result(__FUNCTION__, __LINE__, err);
+		// 	err = vkResetCommandPool(g_device, commandPool, 0);
+		// 	check_vk_result(__FUNCTION__, __LINE__, err);
 
-			VkCommandBufferBeginInfo beginInfo = {};
-			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-			beginInfo.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-			err = vkBeginCommandBuffer(commandBuffer, &beginInfo);
-			check_vk_result(__FUNCTION__, __LINE__, err);
+		// 	VkCommandBufferBeginInfo beginInfo = {};
+		// 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		// 	beginInfo.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+		// 	err = vkBeginCommandBuffer(commandBuffer, &beginInfo);
+		// 	check_vk_result(__FUNCTION__, __LINE__, err);
 
-			/* ImGui_ImplVulkan_CreateFontsTexture(commandBuffer); */
-			ImGui_ImplVulkan_CreateFontsTexture();
+		// 	/* ImGui_ImplVulkan_CreateFontsTexture(commandBuffer); */
+		// 	ImGui_ImplVulkan_CreateFontsTexture();
 
-			VkSubmitInfo end_info = {};
-			end_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-			end_info.commandBufferCount = 1;
-			end_info.pCommandBuffers = &commandBuffer;
-			err = vkEndCommandBuffer(commandBuffer);
-			check_vk_result(__FUNCTION__, __LINE__, err);
-			err = vkQueueSubmit(g_queue, 1, &end_info, VK_NULL_HANDLE);
-			check_vk_result(__FUNCTION__, __LINE__, err);
+		// 	VkSubmitInfo end_info = {};
+		// 	end_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		// 	end_info.commandBufferCount = 1;
+		// 	end_info.pCommandBuffers = &commandBuffer;
+		// 	err = vkEndCommandBuffer(commandBuffer);
+		// 	check_vk_result(__FUNCTION__, __LINE__, err);
+		// 	err = vkQueueSubmit(g_queue, 1, &end_info, VK_NULL_HANDLE);
+		// 	check_vk_result(__FUNCTION__, __LINE__, err);
 
-			err = vkDeviceWaitIdle(g_device);
-			check_vk_result(__FUNCTION__, __LINE__, err);
-			/* ImGui_ImplVulkan_DestroyFontUploadObjects(); */
-			ImGui_ImplVulkan_DestroyFontsTexture();
-		}
+		// 	err = vkDeviceWaitIdle(g_device);
+		// 	check_vk_result(__FUNCTION__, __LINE__, err);
+		// 	/* ImGui_ImplVulkan_DestroyFontUploadObjects(); */
+		// 	ImGui_ImplVulkan_DestroyFontsTexture();
+		// }
 	}
 	
 	void Application::shutdown(){

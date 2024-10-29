@@ -17,7 +17,7 @@ class MiniGameEngine(ConanFile):
     default_options = {"shared": False, "fPIC": True}
 
     # Sources are located in the same place as this recipe, copy them to the recipe
-    export_sources = "CMakeLists.txt", "include/Mini-GameEngine/*.h", "src/CMakeLists.txt", "src/Mini-GameEngine/*", "Sandbox/*"
+    exports_sources = "CMakeLists.txt", "include/Mini-GameEngine/*.h", "src/CMakeLists.txt", "src/Mini-GameEngine/*", "Sandbox/*", "RayTracing/*"
 
     def requirements(self):
         self.requires("make/4.4.1")
@@ -32,6 +32,7 @@ class MiniGameEngine(ConanFile):
         self.requires("yaml-cpp/0.8.0", transitive_headers=True)
         self.requires("box2d/2.4.2")
         self.requires("opengl/system", transitive_headers=True)
+        self.requires("imguidocking/1.0")
         
         # engine3d-dev customized conan packages for these dependencies
 
@@ -40,7 +41,7 @@ class MiniGameEngine(ConanFile):
         if self.settings.os == "Linux":
             self.requires("vulkan-loader/1.3.290.0")
         print(f"OS = {self.settings.os}")            
-        self.requires("imguidocking/1.0")
+
         # self.requires("joltphysics/1.0")
         # self.requires("assimp/5.4.1")
     
@@ -94,4 +95,6 @@ class MiniGameEngine(ConanFile):
 
     def package_info(self):
         self.cpp_info.set_property("cmake_target_name", "mini-vulkan::mini-vulkan")
+        self.cpp_info.system_libs = ["imguidocking"]
         self.cpp_info.libs = ["mini-vulkan"]
+
